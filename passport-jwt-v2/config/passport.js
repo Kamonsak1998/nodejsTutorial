@@ -1,13 +1,15 @@
 const passport = require('passport'), 
     passportJWT = require('passport-jwt'),
     JWTStraegy = passportJWT.Strategy,
-    ExtractJWT = passportJWT.ExtractJwt
+    ExtractJWT = passportJWT.ExtractJwt,
     bcrypt = require('bcrypt'),
+    fs = require('fs'),
+    privateKey = fs.readFileSync(__dirname+'/../config/private.key'),
     User = require('../models/Users')
 
 passport.use(new JWTStraegy({
         jwtFromRequest : ExtractJWT.fromAuthHeaderAsBearerToken(),
-        secretOrKey : 'God_Dev_JWT_SECRET'
+        secretOrKey : privateKey
     },
     (jwtPayload,cb) => {
     User.findOne({"username":jwtPayload}, (err,user) => {

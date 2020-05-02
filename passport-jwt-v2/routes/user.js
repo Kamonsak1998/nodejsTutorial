@@ -1,4 +1,5 @@
 const router = require('express').Router(),
+    bcrypt = require('bcrypt')
     User = require('../models/Users')
 
 // get user
