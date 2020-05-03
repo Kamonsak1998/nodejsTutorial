@@ -12,7 +12,7 @@ passport.use(new JWTStraegy({
         secretOrKey : privateKey
     },
     (jwtPayload,cb) => {
-    User.findOne({"username":jwtPayload}, (err,user) => {
+    User.findOne({"username":jwtPayload.username}, (err,user) => {
         if (err){
             return cb(err)
         }

@@ -13,6 +13,7 @@ router.post('/register',(req,res) => {
         password: passwordHashed,
         firstName,
         lastName,
+        role: "user",
         birthDate
     })
     user.save()
@@ -24,9 +25,13 @@ router.post('/login',async(req,res) => {
         const {username, password} = req.body
         const privateKey = fs.readFileSync(__dirname+'/../config/private.key')
         const user = await User.findOne({"username":username})
+        const payload = {
+            username: username,
+            iat: new Date().getTime(),
+        }
         if (user){
             if (bcrypt.compareSync(password,user.password)){
-                const token = jwt.sign(user.username,privateKey)
+                const token = jwt.sign(payload,privateKey)
                 return res.json({token,"message":"Logged in"})
             }else{
                 return res.json({"message":"Username or Password is incorrect"})
@@ -35,7 +40,5 @@ router.post('/login',async(req,res) => {
             return res.json({"message":"Username or Password is incorrect"})
     }
 })
-
-
 
 module.exports = router;

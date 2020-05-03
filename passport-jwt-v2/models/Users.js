@@ -10,6 +10,7 @@ const userShema = new Shcema({
         firstName: String,
         lastName: String,
         password: String,
+        role: String,
         birthDate: Date,
     },
     {
