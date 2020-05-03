@@ -7,17 +7,23 @@ const router = require('express').Router(),
 // register
 router.post('/register',(req,res) => {
     const {username, password, firstName, lastName, birthDate} = req.body
-    const passwordHashed = bcrypt.hashSync(password,10)
-    const user = new User({
-        username,
-        password: passwordHashed,
-        firstName,
-        lastName,
-        role: "user",
-        birthDate
+    User.count({"username":username},(error, count) => {
+        if (count>0){
+            return res.json({"message":"User already exists"})
+        }else{
+            const passwordHashed = bcrypt.hashSync(password,10)
+            const user = new User({
+                username,
+                password: passwordHashed,
+                firstName,
+                lastName,
+                role: "user",
+                birthDate
+            })
+            user.save()
+            return res.status(201).json({user,"message": 'Successfully registered'}).end()
+        }
     })
-    user.save()
-    return res.json({user,"message": 'Successfully registered'})
 })
 
 // login
