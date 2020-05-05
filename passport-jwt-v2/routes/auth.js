@@ -1,19 +1,27 @@
 const router = require('express').Router(),
     jwt = require('jsonwebtoken'),
     bcrypt = require('bcrypt'),
-    fs = require('fs')
-    User = require('../models/Users')
+    fs = require('fs'),
+    User = require('../models/Users'),
+    { check, validationResult } = require('express-validator')
 
 // register
-router.post('/register',(req,res) => {
-    const {username, password, firstName, lastName, birthDate} = req.body
-    User.count({"username":username},(error, count) => {
+router.post('/register',[
+    check('email').isEmail(),
+    check('password').matches()
+    ],(req,res) => {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()){
+        return res.status(422).json({ errors: errors.array()})
+    }
+    const {email, password, firstName, lastName, birthDate} = req.body
+    User.count({"email":email},(error, count) => {
         if (count>0){
             return res.json({"message":"User already exists"})
         }else{
             const passwordHashed = bcrypt.hashSync(password,10)
             const user = new User({
-                username,
+                email,
                 password: passwordHashed,
                 firstName,
                 lastName,
@@ -28,11 +36,11 @@ router.post('/register',(req,res) => {
 
 // login
 router.post('/login',async(req,res) => {
-        const {username, password} = req.body
+        const {email, password} = req.body
         const privateKey = fs.readFileSync(__dirname+'/../config/private.key')
-        const user = await User.findOne({"username":username})
+        const user = await User.findOne({"email":email})
         const payload = {
-            username: username,
+            email: email,
             iat: new Date().getTime(),
         }
         if (user){
@@ -40,10 +48,10 @@ router.post('/login',async(req,res) => {
                 const token = jwt.sign(payload,privateKey)
                 return res.json({token,"message":"Logged in"})
             }else{
-                return res.json({"message":"Username or Password is incorrect"})
+                return res.json({"message":"Email or Password is incorrect"})
             }
         }else{
-            return res.json({"message":"Username or Password is incorrect"})
+            return res.json({"message":"Email or Password is incorrect"})
     }
 })
 

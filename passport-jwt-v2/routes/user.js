@@ -1,6 +1,7 @@
 const router = require('express').Router(),
     bcrypt = require('bcrypt')
-    User = require('../models/Users')
+    User = require('../models/Users'),
+    { check, validationResult } = require('express-validator')
 
     
 // get user profile
@@ -9,10 +10,16 @@ router.get('/profile',async(req,res) => {
 })
 
 // update user
-router.put('/profile',async(req,res) => {
+router.put('/profile',[
+    check('password').isLength({min: 6})
+],async(req,res) => {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()){
+        return res.status(422).json({errors:errors.array()})
+    }
     const {password, firstName, lastName, birthDate} = req.body
     const passwordHashed = bcrypt.hashSync(password,10)
-    const user = await User.findOneAndUpdate({"username":req.user.username},{$set:{
+    const user = await User.findOneAndUpdate({"email":req.user.email},{$set:{
         password: passwordHashed,
         firstName,
         lastName,
@@ -24,7 +31,7 @@ router.put('/profile',async(req,res) => {
 // delete user
 router.delete('/profile',async(req,res) => {
     if (req.user.role == "admin"){
-        const user = await User.findOneAndDelete({"username":req.user.username})
+        const user = await User.findOneAndDelete({"email":req.user.email})
         return res.json({"message":"Delete success"}).end()
     }else{
         return res.status(403).json({"status": 403,"message": "Forbidden"}).end()

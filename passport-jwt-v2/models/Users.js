@@ -3,7 +3,7 @@ const mongoose = require('mongoose'),
 
 
 const userShema = new Shcema({
-        username: {
+        email: {
             type: String,
             unique: true,
         },
