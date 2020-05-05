@@ -8,14 +8,14 @@ const router = require('express').Router(),
 // register
 router.post('/register',[
     check('email').isEmail(),
-    check('password').matches()
+    check('password','Password should not be empty, minimum eight characters, at least one letter, one number and one special character').isLength({min: 8})
     ],(req,res) => {
-    const errors = validationResult(req)
-    if (!errors.isEmpty()){
-        return res.status(422).json({ errors: errors.array()})
-    }
-    const {email, password, firstName, lastName, birthDate} = req.body
-    User.count({"email":email},(error, count) => {
+        const errors = validationResult(req)
+        if (!errors.isEmpty()){
+            return res.status(422).json({ errors: errors.array()})
+        }
+        const {email, password, firstName, lastName, birthDate} = req.body
+        User.count({"email":email},(error, count) => {
         if (count>0){
             return res.json({"message":"User already exists"})
         }else{
