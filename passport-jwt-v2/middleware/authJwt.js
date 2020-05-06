@@ -23,3 +23,11 @@ passport.use(new JWTStraegy({
         }
     })
 }))
+
+exports.isAdmin = (req,res,next) => {
+    if (req.user.role == "admin"){
+        return next()
+    }else{
+        return res.status(403).json({"status": 403,"message": "Forbidden"}).end()
+    }
+}

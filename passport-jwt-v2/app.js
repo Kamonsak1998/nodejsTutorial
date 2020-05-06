@@ -7,7 +7,7 @@ const express = require('express'),
 
 // Connect to database And Use passport
 require('./config/db')
-require('./config/passport')
+require('./middleware/authJwt')
 
 // Set Parses JSON
 app.use(express.json())
