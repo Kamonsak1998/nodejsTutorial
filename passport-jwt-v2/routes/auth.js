@@ -5,6 +5,7 @@ const router = require('express').Router(),
 // register
 router.post('/register',[
     check('email').isEmail(),
+    check(['firstName','lastName','birthDate'],'first name or last name or birthDate should not be empty').not().isEmpty(),
     check('password','Password should not be empty, minimum eight characters, at least one letter, one number and one special character').isLength({min: 8})
     ],authController.register)
 
